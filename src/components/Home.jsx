@@ -10,7 +10,7 @@ export default function Home() {
     const [series, setSeries] = useState(null)
 
     useEffect(() => {
-        document.title = "Home | MovieStream"; // or whatever your title is
+        document.title = "Home | CW Movies"; // or whatever your title is
       }, []);
       
     useEffect(() => {
