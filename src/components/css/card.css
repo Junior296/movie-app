@@ -1,0 +1,26 @@
+.card {
+    position: relative;
+    overflow: hidden;
+  }
+  
+  .card .overlay-play {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 250px;
+    width: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    opacity: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: opacity 0.3s ease-in-out;
+    z-index: 1;
+  }
+  
+  .card:hover .overlay-play{
+    opacity: 1;
+  }
+  .card:hover .card-title{
+    color: red;
+  }

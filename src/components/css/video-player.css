@@ -1,0 +1,28 @@
+.video-js{
+    font-size: 16px;
+}
+
+.video-js .vjs-control-bar {
+    background-color: rgba(19, 25, 32, 0.8);
+  }
+ 
+  .video-js .vjs-slider {
+    background: rgb(0, 123, 255);
+  }
+  
+  .video-js .vjs-play-progress:before {
+    content: '';
+    position: absolute;
+    width: 1em;
+    height: 1em;
+    border-radius: 50%;
+    background: red;
+    transform: translate(-50%, -50%);
+    top: 50%;
+    left: 100%;
+    box-shadow: 0 0 2px #000;
+  }
+
+  .video-js .vjs-load-progress {
+    background: white;
+  }
