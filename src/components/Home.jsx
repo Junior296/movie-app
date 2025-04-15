@@ -39,7 +39,7 @@ export default function Home() {
 
     return (
 
-        <div className="container-xl">
+        <div className="container-xl mt-3">
             {categoriesWithMovies.map((category, index) => (
                 <div key={index} className="mb-5">
                     <h3 className="mb-3 text-light">{category.name}</h3>
