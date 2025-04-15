@@ -50,13 +50,16 @@ export default function AllSerieParts() {
                 {/* <p>Categories: {serie.categories.map(cat => <span>{cat.name} </span>)}</p> */}
                 {/* <p>Tags: {serie.get_taglist.map(tag => <span>{tag} </span>)}</p> */}
             </div>
-            <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+            <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 justify-content-center">
                 {serie.movies.map((movie, index) => (
-                    <div className="col" key={index}>
-                        <SerieCard movie={movie} />
+                    <div className="col d-flex justify-content-center" key={index}>
+                        <div style={{ width: '100%', maxWidth: '220px' }}>
+                            <SerieCard movie={movie} />
+                        </div>
                     </div>
                 ))}
             </div>
+
 
             <hr />
             <div className="mb-5">
