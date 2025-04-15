@@ -19,7 +19,10 @@ export default function AllSerieParts() {
     useEffect(() => {
         axios
             .get(`${apiUrl}/serie/view/${id}`)
-            .then((res) => setSerie(res.data))
+            .then((res) => {
+                setSerie(res.data)
+                console.log(`movie data: ${JSON.stringify(res.data)}`)
+            })
             .catch((err) => console.error("Error fetching movie", err));
     }, [id]);
 
@@ -27,7 +30,7 @@ export default function AllSerieParts() {
         axios.get(`${apiUrl}/series`)
             .then(response => {
                 setSeries(response.data)
-                console.log(`series data: ${response.data}`)
+                // console.log(`series data: ${JSON.stringify(response.data)}`)
             })
             .catch(error => console.error("error fetching series")
             )
@@ -43,14 +46,12 @@ export default function AllSerieParts() {
         );
     }
     return (
-        <div className="container-fluid text-center">
-            <div className="m-5">
-                <h1 className="text-primary">{serie.title}</h1>
-                {/* <p className="text-muted fs-5 border rounded-3 p-3">{serie.description}</p> */}
-                {/* <p>Categories: {serie.categories.map(cat => <span>{cat.name} </span>)}</p> */}
-                {/* <p>Tags: {serie.get_taglist.map(tag => <span>{tag} </span>)}</p> */}
+        <div className="container-xl">
+            <div className="mb-5">
+                <h3 className="text-primary text-center mb-4">{serie.title} <span className="fs-5 text-danger"> - By VJ {serie.vj_name}</span></h3>
+                <p className="fs-5 border text-light rounded-3 p-3">{serie.description}</p>
             </div>
-            <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 justify-content-center">
+            <div className="row row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4 justify-content-center">
                 {serie.movies.map((movie, index) => (
                     <div className="col d-flex justify-content-center" key={index}>
                         <div style={{ width: '100%', maxWidth: '220px' }}>

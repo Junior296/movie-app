@@ -25,17 +25,16 @@ export default function AllCategoryMovies() {
         );
     }
     return (
-        <div className="container-fluid text-center">
+        <div className="container">
             <div className="m-5">
                 <h1 className="text-primary">{name} Movies</h1>
-                {/* <p className="text-muted fs-5 border rounded-3 p-3">{serie.description}</p> */}
-                {/* <p>Categories: {serie.categories.map(cat => <span>{cat.name} </span>)}</p> */}
-                {/* <p>Tags: {serie.get_taglist.map(tag => <span>{tag} </span>)}</p> */}
             </div>
-            <div className="row row-cols-2 row-cols-sm-2 row-cols-md-3 row-cols-lg-5 g-4">
+            <div className="row row-cols-sm-2 row-cols-md-2 row-cols-lg-3 row-cols-xl-4 row-cols-xxl-5 g-4">
                 {movies.map((movie, index) => (
-                    <div className="col" key={index}>
-                        {movie.other_parts.length > 0 ? <SerieCard key={movie.id} movie={movie} /> : <MovieCard key={movie.id} movie={movie} />}
+                    <div className="col  d-flex justify-content-center" key={index}>
+                        <div style={{ width: '100%', maxWidth: '220px' }}>
+                            <MovieCard key={movie.id} movie={movie} />
+                        </div>
                     </div>
                 ))}
             </div>

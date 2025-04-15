@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 
 export default function MovieCard({ movie }) {
   return (
-    <div className="card shadow-sm border m-2" style={{ minWidth: "250px", minHeight: "300px", border: 'none' }}>
+    <div className="card shadow-sm bg-dark m-2" style={{ minWidth: "250px", minHeight: "300px", border: '1px solid black' }}>
       <Link to={`/movie/${movie.id}`}>
-        <div style={{ height: "300px"}}   className="overlay-play position-absolute">
+        <div style={{ height: "300px" }} className="overlay-play position-absolute">
           <img
             width="50"
             height="50"
@@ -21,7 +21,8 @@ export default function MovieCard({ movie }) {
         />
       </Link>
       <div className="card-body px-2 py-2">
-        <h6 className="card-title text-truncate mb-0">{movie.name}</h6>
+        <h5 className="card-title text-light text-truncate mb-2">{movie.name}</h5>
+        <Link className="text-decoration-none text-primary text-end" to={`/movies/search/${movie.vj_name}`}>VJ {movie.vj_name}</Link>
       </div>
     </div>
   );

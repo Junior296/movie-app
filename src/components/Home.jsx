@@ -11,8 +11,8 @@ export default function Home() {
 
     useEffect(() => {
         document.title = "Home | CW Movies"; // or whatever your title is
-      }, []);
-      
+    }, []);
+
     useEffect(() => {
         axios.get(`${apiUrl}/movies/categories`)
             .then(response => {
@@ -39,10 +39,10 @@ export default function Home() {
 
     return (
 
-        <div className="container-fluid">
+        <div className="container-xl">
             {categoriesWithMovies.map((category, index) => (
                 <div key={index} className="mb-5">
-                    <h3 className="mb-3">{category.name}</h3>
+                    <h3 className="mb-3 text-light">{category.name}</h3>
                     <div className="d-flex overflow-auto gap-3">
                         {category.movies.slice(0, 10).map(movie => (
                             <MovieCard key={movie.id} movie={movie} />
@@ -52,12 +52,12 @@ export default function Home() {
             ))}
 
             <div className="mb-5">
-                <h3 className="mb-3">Series</h3>
+                <h3 className="mb-3 text-light">Series</h3>
                 <div className="d-flex overflow-auto gap-3">
                     {series ? series.sort((a, b) => b.id - a.id).map((serie) => (
-                        <div className="card shadow-sm border mb-2" style={{ minWidth: "200px", minHeight: "300px", border: 'none' }}>
+                        <div className="card shadow-sm mb-2 bg-dark" style={{ minWidth: "250px", minHeight: "300px", border: '2px solid black' }}>
                             <Link to={`/serie/${serie.id}`} className="position-relative">
-                                <div className="overlay-play position-absolute">
+                                <div className="overlay-play position-absolute" style={{ height: '300px' }}>
                                     <img
                                         width="50"
                                         height="50"
@@ -70,10 +70,12 @@ export default function Home() {
                                 src={serie.thumb}
                                 className="card-img-top"
                                 alt={serie.title}
-                                style={{ height: "250px", width: '100%', objectFit: "cover" }}
+                                style={{ height: "300px", width: '100%', objectFit: "cover" }}
                             />
                             <div className="card-body px-2 py-2">
-                                <h6 className="card-title text-truncate mb-0">{serie.title}</h6>
+                                <h5 className="card-title text-light text-truncate mb-2">{serie.title}</h5>
+                                <h6 className="text-primary text-end mb-0">VJ {serie.vj_name}</h6>
+
                             </div>
                         </div>
                     )) : <p>Loading...</p>}
