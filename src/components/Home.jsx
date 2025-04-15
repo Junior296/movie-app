@@ -39,10 +39,10 @@ export default function Home() {
 
     return (
 
-        <div className="container-xl mt-3">
+        <div className="container-xl mt-5">
             {categoriesWithMovies.map((category, index) => (
                 <div key={index} className="mb-5">
-                    <h3 className="mb-3 text-light">{category.name}</h3>
+                    <Link className="btn btn-danger mb-3 fs-3 w-25 " to={`/category/${category.name}`} key={index}>{category.name}</Link>
                     <div className="d-flex overflow-auto gap-3">
                         {category.movies.slice(0, 10).map(movie => (
                             <MovieCard key={movie.id} movie={movie} />
