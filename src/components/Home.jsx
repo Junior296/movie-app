@@ -42,7 +42,7 @@ export default function Home() {
         <div className="container-xl mt-5">
             {categoriesWithMovies.map((category, index) => (
                 <div key={index} className="mb-5">
-                    <Link className="btn btn-danger mb-3 fs-3 w-25 " to={`/category/${category.name}`} key={index}>{category.name}</Link>
+                    <Link className="btn btn-danger mb-3 fs-3" to={`/category/${category.name}`} key={index}>{category.name}</Link>
                     <div className="d-flex overflow-auto gap-3">
                         {category.movies.slice(0, 10).map(movie => (
                             <MovieCard key={movie.id} movie={movie} />
