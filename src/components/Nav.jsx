@@ -38,7 +38,7 @@ export default function Nav() {
 
 
     return (
-        <div className="mb-5">
+        <div>
             <nav className="navbar bg-dark border-bottom border-body" data-bs-theme="dark">
                 <div className="container-fluid">
                     <Link className="navbar-brand" to={`/`}>CW Movies</Link>
@@ -79,7 +79,7 @@ export default function Nav() {
                         left: 0,
                     }}
                 >
-                    <h2 className="text-primary text-center m-4">Results for '{query}'</h2>
+                    <h2 className="text-primary text-center">Results for '{query}'</h2>
 
                     <div className="row row-cols-1 row-cols-sm-2 row-cols-md-2 row-cols-lg-5 g-2">
                         {movies.map((movie, index) => (
