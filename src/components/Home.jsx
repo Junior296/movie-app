@@ -14,6 +14,7 @@ export default function Home() {
         document.title = "Home | CW Movies";
     }, []);
 
+    
     useEffect(() => {
         const fetchData = async () => {
             try {
