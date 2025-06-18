@@ -6,43 +6,53 @@ import './css/card.css';
 import { Link } from "react-router-dom";
 
 export default function Home() {
-    const [categoriesWithMovies, setCategoryWithMovies] = useState(null)
-    const [series, setSeries] = useState(null)
+    const [categoriesWithMovies, setCategoryWithMovies] = useState(null);
+    const [series, setSeries] = useState(null);
+    const [loading, setLoading] = useState(true); // 🔹 Add loading state
 
     useEffect(() => {
-        document.title = "Home | CW Movies"; // or whatever your title is
+        document.title = "Home | CW Movies";
     }, []);
 
     useEffect(() => {
-        axios.get(`${apiUrl}/movies/categories`)
-            .then(response => {
-                setCategoryWithMovies(response.data)
-                // console.log(`movies data: ${response.data}`)
-            })
-            .catch(error => console.error("error fetching movies")
-            )
-    }, [])
+        const fetchData = async () => {
+            try {
+                const [categoriesRes, seriesRes] = await Promise.all([
+                    axios.get(`${apiUrl}/movies/categories`),
+                    axios.get(`${apiUrl}/series`)
+                ]);
 
-    useEffect(() => {
-        axios.get(`${apiUrl}/series`)
-            .then(response => {
-                setSeries(response.data)
-                console.log(`series data: ${response.data}`)
-            })
-            .catch(error => console.error("error fetching series")
-            )
-    }, [])
+                setCategoryWithMovies(categoriesRes.data);
+                setSeries(seriesRes.data);
+            } catch (error) {
+                console.error("Error fetching data", error);
+            } finally {
+                setLoading(false); // 🔹 Only stop loading after both requests finish
+            }
+        };
+
+        fetchData();
+    }, []);
+
+    if (loading) {
+        return (
+            <div style={{ height: '100vh' }} className="d-flex align-items-center justify-content-center bg-dark">
+                <div className="spinner-border text-danger fs-1" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+    }
 
 
-    if (!categoriesWithMovies) return <div style={{ height: '100vh' }} className="d-flex align-items-center justify-content-center fs-1"><p>Loading...</p></div>;
-    if (!series) return <div style={{ height: '100vh' }} className="d-flex align-items-center justify-content-center fs-1"><p>Loading...</p></div>;
 
     return (
-
         <div className="container-xl mt-5">
             {categoriesWithMovies.map((category, index) => (
                 <div key={index} className="mb-5">
-                    <Link className="btn btn-danger mb-3 fs-3" to={`/category/${category.name}`} key={index}>{category.name}</Link>
+                    <Link className="btn btn-danger mb-3 fs-3" to={`/category/${category.name}`}>
+                        {category.name}
+                    </Link>
                     <div className="d-flex overflow-auto gap-3">
                         {category.movies.slice(0, 10).map(movie => (
                             <MovieCard key={movie.id} movie={movie} />
@@ -54,8 +64,12 @@ export default function Home() {
             <div className="mb-5">
                 <h3 className="mb-3 text-light">Series</h3>
                 <div className="d-flex overflow-auto gap-3">
-                    {series ? series.sort((a, b) => b.id - a.id).map((serie) => (
-                        <div className="card shadow-sm mb-2 bg-dark" style={{ minWidth: "250px", minHeight: "300px", border: '2px solid black' }}>
+                    {series.sort((a, b) => b.id - a.id).map((serie) => (
+                        <div
+                            key={serie.id}
+                            className="card shadow-sm mb-2 bg-dark"
+                            style={{ minWidth: "250px", minHeight: "300px", border: '2px solid black' }}
+                        >
                             <Link to={`/serie/${serie.id}`} className="position-relative">
                                 <div className="overlay-play position-absolute" style={{ height: '300px' }}>
                                     <img
@@ -65,24 +79,21 @@ export default function Home() {
                                         alt="Play"
                                     />
                                 </div>
+                                <img
+                                    src={serie.thumb}
+                                    className="card-img-top"
+                                    alt={serie.title}
+                                    style={{ height: "300px", width: '100%', objectFit: "cover" }}
+                                />
                             </Link>
-                            <img
-                                src={serie.thumb}
-                                className="card-img-top"
-                                alt={serie.title}
-                                style={{ height: "300px", width: '100%', objectFit: "cover" }}
-                            />
                             <div className="card-body px-2 py-2">
                                 <h5 className="card-title text-light text-truncate mb-2">{serie.title}</h5>
                                 <h6 className="text-primary text-end mb-0">VJ {serie.vj_name}</h6>
-
                             </div>
                         </div>
-                    )) : <p>Loading...</p>}
+                    ))}
                 </div>
             </div>
-
         </div>
-
     );
 }
