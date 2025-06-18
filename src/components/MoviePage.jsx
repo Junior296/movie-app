@@ -1,70 +1,108 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import apiUrl from "./Api";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { VideoJS } from "./VideoJS";
-import MovieCard from "./MovieCard";
-import { Link } from "react-router-dom";
+import SerieCard from "./serieCard";
 
-export default function MoviePage() {
+export default function SeriePage() {
     const { id } = useParams();
     const [movie, setMovie] = useState(null);
+    const [series, setSeries] = useState([]);
 
-    // MoviePage.jsx
     useEffect(() => {
-        if (movie) {
-            document.title = `${movie.name} | CW Movie`;
-        }
+        if (movie) document.title = `${movie.name} | CW Movie`;
     }, [movie]);
 
     useEffect(() => {
-        axios
-            .get(`${apiUrl}/movies/view/${id}`)
-            .then((res) => setMovie(res.data))
-            .catch((err) => console.error("Error fetching movie", err));
+        axios.get(`${apiUrl}/movies/view/${id}`)
+            .then(res => setMovie(res.data))
+            .catch(err => console.error("Error fetching movie", err));
     }, [id]);
+
+    useEffect(() => {
+        axios.get(`${apiUrl}/series`)
+            .then(res => setSeries(res.data))
+            .catch(err => console.error("Error fetching series", err));
+    }, []);
 
     if (!movie) {
         return (
-            <div style={{ height: "100vh" }} className="d-flex align-items-center justify-content-center fs-1">
-                <p>Loading...</p>
+            <div className="container-fluid text-white d-flex align-items-center justify-content-center" style={{ height: '100vh' }}>
+                <div className="spinner-border text-danger" role="status" />
             </div>
         );
     }
 
     const videoJsOptions = {
-        autoplay: true,
+        autoplay: false,
         controls: true,
         responsive: true,
         fluid: true,
-        sources: [
-            {
-                src: movie.video,
-                type: "video/mp4"
-            }
-        ]
+        sources: [{
+            src: movie.video,
+            type: "video/mp4"
+        }]
     };
 
-
     return (
-        <div className="container-xl">
-            <div className="row">
-                <div className="col-12">
-                    <VideoJS options={videoJsOptions} onReady={(player) => console.log("VideoJS Ready!", player)} />
+        <div className="bg-black text-white pb-5">
+            <div className="container-xl p-4">
+                {/* Video Player */}
+                <div style={{ position: 'relative', paddingTop: '56.25%' }} className="mb-5">
+                    <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%' }} className="border p-4 rounded">
+                        <VideoJS options={videoJsOptions} />
+                    </div>
                 </div>
-                <div className="col-12 mt-3 m-1">
-                    <h3 className="text-primary mb-3">{movie.name} <Link className="text-decoration-none fs-4 text-danger" to={`/movies/search/${movie.vj_name}`}>- VJ {movie.vj_name}</Link></h3>
-                    <p className="text-light fs-5 border rounded-3 p-3">{movie.description}</p>
-                    <p className="text-light mb-4 mt-4">Categories: {movie.categories.map((cat, index) => <Link className="btn btn-outline-primary mx-2" to={`/category/${cat.name}`} key={index}>{cat.name}</Link>)}</p>
-                    <p className="text-light">Tags: {movie.get_taglist.map(tag => <Link to={`/movies/search/${tag.slice(1)}`} className="btn btn-outline-success mx-2" type="submit">{tag}</Link>)}</p>
-                </div>
-                <div className="col-12 mt-3 m-1">
-                    <h3 className="text-primary">Related Movies</h3>
-                    <div className="d-flex overflow-auto gap-3">
-                        {movie.related_by_name.map((relatedMovie) => (
-                            <MovieCard key={relatedMovie.id} movie={relatedMovie} />
+
+
+                {/* Title & Info */}
+                <h2 className="text-light mb-3">{movie.name}</h2>
+                <p className="text-light bg-dark p-3 rounded">{movie.description}</p>
+
+                {/* Tags */}
+                {movie.get_taglist.length > 0 && (
+                    <div className="mb-4">
+                        <h5 className="text-danger">Tags:</h5>
+                        {movie.get_taglist.map((tag, i) => (
+                            <Link key={i} to={`/movies/search/${tag.slice(1)}`} className="btn btn-outline-success btn-sm me-2 mb-2">{tag}</Link>
                         ))}
                     </div>
+                )}
+
+
+                {/* Other movies */}
+                <h4 className="text-danger mb-3">Other Movies</h4>
+                <div className="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3">
+                    {movie.related_by_name.map((related) => (
+                        <div className="col" key={related.id}>
+                            <Link to={`/movie/${related.id}`} className="text-decoration-none">
+                                <div className="card bg-dark text-white h-100 border-0">
+                                    <div className="position-relative">
+                                        <img
+                                            src={related.thumb}
+                                            className="card-img-top"
+                                            alt={related.title}
+                                            style={{ height: "300px", objectFit: "cover" }}
+                                        />
+                                        <div className="position-absolute top-50 start-50 translate-middle">
+                                            <img
+                                                src="https://img.icons8.com/ios-filled/50/ffffff/play-button-circled.png"
+                                                width="48"
+                                                alt="Play"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div className="card-body px-2 py-1">
+                                        <h6 className="card-title text-truncate mb-1">{related.title}</h6>
+                                        <p className="card-text text-end text-info mb-0" style={{ fontSize: "0.75rem" }}>
+                                            VJ {related.vj_name}
+                                        </p>
+                                    </div>
+                                </div>
+                            </Link>
+                        </div>
+                    ))}
                 </div>
             </div>
         </div>

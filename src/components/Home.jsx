@@ -1,45 +1,114 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import axios from "axios";
 import apiUrl from "./Api";
 import MovieCard from "./MovieCard";
+import './css/netflix.css';
 import './css/card.css';
+import './css/shimmer.css';
+import HeroCarousel from "./Slider";
 import { Link } from "react-router-dom";
 
 export default function Home() {
     const [categoriesWithMovies, setCategoryWithMovies] = useState(null);
+    const [movies, setMovies] = useState([]);
+    const [Scrollmovies, setScrollMovies] = useState([]);
     const [series, setSeries] = useState(null);
-    const [loading, setLoading] = useState(true); // 🔹 Add loading state
+    const [categories, setCategories] = useState(null);
+    const [selectedCategory, setSelectedCategory] = useState("All");
+    const movieRef = useRef();
+
+    const [page, setPage] = useState(1);
+    const [hasMore, setHasMore] = useState(true);
+    const [loading, setLoading] = useState(true);
+    const PAGE_SIZE = 12;
+
 
     useEffect(() => {
         document.title = "Home | CW Movies";
+
+        axios.get(`${apiUrl}/movies/categories`)
+            .then(res => setCategoryWithMovies(res.data))
+            .catch(err => console.error("Error fetching categories with movies"));
+
+        axios.get(`${apiUrl}/series`)
+            .then(res => setSeries(res.data))
+            .catch(err => console.error("Error fetching series"));
+
+        axios.get(`${apiUrl}/categories`)
+            .then(response => setCategories(response.data))
+            .catch(error => console.error("Error fetching categories"));
+
+        axios.get(`${apiUrl}/movies/scroll`)
+            .then(res => setScrollMovies(res.data))
+            .catch(error => console.error(error))
     }, []);
 
     useEffect(() => {
-        const fetchData = async () => {
-            try {
-                const [categoriesRes, seriesRes] = await Promise.all([
-                    axios.get(`${apiUrl}/movies/categories`),
-                    axios.get(`${apiUrl}/series`)
-                ]);
+        // Initial load (All movies)
+        if (selectedCategory === "All") {
+            fetchMovies(page);
+        }
+    }, [page]);
 
-                setCategoryWithMovies(categoriesRes.data);
-                setSeries(seriesRes.data);
-            } catch (error) {
-                console.error("Error fetching data", error);
-            } finally {
-                setLoading(false); // 🔹 Only stop loading after both requests finish
-            }
-        };
+    const fetchMovies = (pg) => {
+        setLoading(true);
+        axios.get(`${apiUrl}/movies?page=${pg}`)
+            .then(res => {
+                setMovies(prev => [...prev, ...res.data.results]);
+                setHasMore(res.data.next !== null);
+            })
+            .catch(error => console.error(error))
+            .finally(() => setLoading(false));
+    };
 
-        fetchData();
-    }, []);
+    const fetchCategoryMovies = (category, pg) => {
+        setLoading(true);
+        const url = `${apiUrl}/movies/category/${category}?page=${pg}`;
+        axios.get(url)
+            .then(res => {
+                setMovies(prev => [...prev, ...res.data.results]);
+                setHasMore(res.data.next !== null);
+            })
+            .catch(error => console.error("Error loading movies", error))
+            .finally(() => setLoading(false));
+    };
 
-    if (loading) {
+    const onSelected = (category) => {
+        setSelectedCategory(category);
+        setPage(1);
+        setMovies([]);
+        setHasMore(true);
+
+        if (category === "All") {
+            fetchMovies(1);
+        } else {
+            fetchCategoryMovies(category, 1);
+        }
+    };
+
+    const loadMore = () => {
+        const nextPage = page + 1;
+        setPage(nextPage);
+
+        if (selectedCategory === "All") {
+            fetchMovies(nextPage);
+        } else {
+            fetchCategoryMovies(selectedCategory, nextPage);
+        }
+    };
+
+    const scrollToMovies = () => {
+        movieRef.current?.scrollIntoView({ behavior: 'smooth' });
+    };
+
+    if (!series || !categories) {
         return (
-            <div style={{ height: '100vh' }} className="d-flex align-items-center justify-content-center bg-dark">
-                <div className="spinner-border text-danger fs-1" role="status">
-                    <span className="visually-hidden">Loading...</span>
-                </div>
+            <div className="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3 m-2">
+                {[...Array(24)].map((_, index) => (
+                    <div key={index} className="col">
+                        <div className="shimmer-card" />
+                    </div>
+                ))}
             </div>
         );
     }
@@ -47,31 +116,83 @@ export default function Home() {
 
 
     return (
-        <div className="container-xl mt-5">
-            {categoriesWithMovies.map((category, index) => (
-                <div key={index} className="mb-5">
-                    <Link className="btn btn-danger mb-3 fs-3" to={`/category/${category.name}`}>
-                        {category.name}
-                    </Link>
-                    <div className="d-flex overflow-auto gap-3">
-                        {category.movies.slice(0, 10).map(movie => (
-                            <MovieCard key={movie.id} movie={movie} />
+        <div className="text-white bg-black py-4">
+            {/* Hero Section */}
+
+            <HeroCarousel movies={Scrollmovies} />
+
+
+            <div ref={movieRef}>
+                {/* Category Filters */}
+                <div className="row g-2 justify-content-center mb-5">
+                    <div className="col-auto">
+                        <button
+                            onClick={() => onSelected("All")}
+                            className={`btn ${selectedCategory === "All" ? "btn-danger" : "btn-outline-danger"} text-capitalize shadow-sm`}
+                        >
+                            All
+                        </button>
+                    </div>
+                    {categories.map((cat, index) => (
+                        <div className="col-auto" key={index}>
+                            <button
+                                onClick={() => onSelected(cat.name)}
+                                className={`btn ${selectedCategory === cat.name ? "btn-danger" : "btn-outline-danger"} text-capitalize shadow-sm`}
+                            >
+                                {cat.name}
+                            </button>
+                        </div>
+                    ))}
+                </div>
+
+                {/* Movie Grid */}
+                {loading && movies.length === 0 ? (
+                    <div className="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3 m-2">
+                        {[...Array(6)].map((_, index) => (
+                            <div key={index} className="col">
+                                <div className="shimmer-card" />
+                            </div>
                         ))}
                     </div>
-                </div>
-            ))}
+                ) : (
+                    <>
+                        <div className="row row-cols-2 row-cols-md-3 row-cols-lg-6 m-2 g-3">
+                            {movies.map((movie, index) => (
+                                <div className="col" key={index}>
+                                    <MovieCard movie={movie} />
+                                </div>
+                            ))}
+                        </div>
 
-            <div className="mb-5">
-                <h3 className="mb-3 text-light">Series</h3>
-                <div className="d-flex overflow-auto gap-3">
-                    {series.sort((a, b) => b.id - a.id).map((serie) => (
-                        <div
-                            key={serie.id}
-                            className="card shadow-sm mb-2 bg-dark"
-                            style={{ minWidth: "250px", minHeight: "300px", border: '2px solid black' }}
-                        >
-                            <Link to={`/serie/${serie.id}`} className="position-relative">
-                                <div className="overlay-play position-absolute" style={{ height: '300px' }}>
+                        {/* Load More */}
+                        {hasMore && (
+                            <div className="text-center my-4">
+                                {loading ?
+                                    <div className="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3 m-2">
+                                        {[...Array(6)].map((_, index) => (
+                                            <div key={index} className="col">
+                                                <div className="shimmer-card" />
+                                            </div>
+                                        ))}
+                                    </div>
+                                    : <button className="btn btn-outline-danger" onClick={loadMore}>
+                                        Load More
+                                    </button>
+                                }
+                            </div>
+                        )}
+                    </>
+                )}
+            </div>
+
+            {/* Series Section */}
+            <h2 className="category-title ms-2 text-danger">TV Series</h2>
+            <div className="row row-cols-2 row-cols-md-3 row-cols-lg-6 g-3 m-2">
+                {series.map((serie) => (
+                    <div className="col" key={serie.id}>
+                        <Link to={`/serie/${serie.id}`} className="text-decoration-none">
+                            <div className="card bg-dark text-white border-0 rounded shadow-sm" style={{ overflow: "hidden", width: "250px" }}>
+                                <div className="overlay-play position-absolute">
                                     <img
                                         width="50"
                                         height="50"
@@ -81,19 +202,21 @@ export default function Home() {
                                 </div>
                                 <img
                                     src={serie.thumb}
-                                    className="card-img-top"
+                                    className="thumb"
                                     alt={serie.title}
-                                    style={{ height: "300px", width: '100%', objectFit: "cover" }}
+                                    style={{ height: "300px", objectFit: "cover" }}
                                 />
-                            </Link>
-                            <div className="card-body px-2 py-2">
-                                <h5 className="card-title text-light text-truncate mb-2">{serie.title}</h5>
-                                <h6 className="text-primary text-end mb-0">VJ {serie.vj_name}</h6>
+                                <div className="card-body p-2">
+                                    <h6 className="card-title text-truncate mb-0" style={{ fontSize: "0.9rem" }}>{serie.title}</h6>
+                                    <p className="card-text text-end text-primary mb-0" style={{ fontSize: "0.75rem" }}>VJ {serie.vj_name}</p>
+                                </div>
                             </div>
-                        </div>
-                    ))}
-                </div>
+                        </Link>
+                    </div>
+                ))}
             </div>
+
+
         </div>
     );
 }

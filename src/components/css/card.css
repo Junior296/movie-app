@@ -7,8 +7,8 @@
     position: absolute;
     top: 0;
     left: 0;
-    height: 250px;
     width: 100%;
+    height: 300px;
     background-color: rgba(0, 0, 0, 0.5);
     opacity: 0;
     display: flex;
@@ -20,7 +20,14 @@
   
   .card:hover .overlay-play{
     opacity: 1;
+    transform: scale(1.03);
   }
+
   .card:hover .card-title{
     color: red;
   }
+
+  .card:hover .thumb {
+  transform: scale(1.03);
+  transition: 0.3s ease-in-out;
+}
