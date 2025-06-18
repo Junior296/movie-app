@@ -1,0 +1,14 @@
+.hero-banner .overlay {
+    background: rgba(0, 0, 0, 0.6);
+    height: 100%;
+    padding: 2rem;
+}
+
+.hero-title {
+    font-size: 3rem;
+    font-weight: bold;
+}
+
+.hero-tagline {
+    font-size: 1.5rem;
+}
