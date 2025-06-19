@@ -80,13 +80,11 @@ export default function Nav() {
                                     onChange={(e) => setQuery(e.target.value)}
                                 />
                             </div>
-                            <Link
-                                to={`/movies/search/${query}`}
+                            <button
                                 className="btn btn-outline-danger ms-2"
-                                onClick={() => setMovies(null)}
                             >
                                 Search
-                            </Link>
+                            </button>
                         </form>
                     </div>
                 </div>
