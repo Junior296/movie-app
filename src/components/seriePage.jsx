@@ -35,7 +35,7 @@ export default function SeriePage() {
     }
 
     const videoJsOptions = {
-        autoplay: false,
+        autoplay: true,
         controls: true,
         responsive: true,
         fluid: true,
